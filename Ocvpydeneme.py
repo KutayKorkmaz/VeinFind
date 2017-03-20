@@ -6,6 +6,7 @@ from time import sleep
 camera=picamera.PiCamera()
 camera.resolution = (1920, 1080)
 camera.contrast=100
+camera.sharpness=100
 camera.capture('denemedamar.jpg')
 img=cv2.imread('denemedamar.jpg')
 img=cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
