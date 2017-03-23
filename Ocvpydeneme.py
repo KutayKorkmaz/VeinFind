@@ -4,9 +4,9 @@ import os
 import picamera
 from time import sleep
 camera=picamera.PiCamera()
-camera.resolution = (1920, 1080)
-camera.contrast=100
-camera.sharpness=100
+camera.resolution = (768,576)
+camera.contrast=0
+camera.sharpness=0
 camera.capture('denemedamar.png')
 sleep(0.042)
 src=cv2.imread('denemedamar.png')
