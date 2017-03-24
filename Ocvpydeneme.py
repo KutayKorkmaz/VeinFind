@@ -2,6 +2,7 @@ import cv2
 import sys
 import os
 import picamera
+import numpy as np
 from time import sleep
 camera=picamera.PiCamera()
 camera.resolution = (768,576)
@@ -10,21 +11,15 @@ camera.sharpness=100
 camera.capture('denemedamar.png')
 sleep(0.042)
 src=cv2.imread('denemedamar.png')
-tmp=cv2.cvtColor(src,cv2.COLOR_BGR2GRAY)
-_,alpha=cv2.threshold(tmp,50,255,cv2.THRESH_BINARY)
-b,g,r=cv2.split(src)
-rgba=[b,g,r,alpha]
-dst=cv2.merge(rgba,4)
-dstg=cv2.cvtColor(dst,cv2.COLOR_BGR2GRAY)
-cv2.imwrite('test.png',dst)
+dstg=cv2.cvtColor(src,cv2.COLOR_BGR2GRAY)
+cv2.imwrite('test.png',dstg)
 img=cv2.imread('test.png')
-imgray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-cv2.imwrite('testgray.png',imgray)
-equ=cv2.equalizeHist(dstg)
+equ=cv2.calcHist([img],[0],None,[256],[30,256])
 cv2.imwrite('graywhist.png',equ)
+img2=cv2.imread('graywhist.png',cv2.IMREAD_GRAYSCALE)
 clahe=cv2.createCLAHE(clipLimit=4.0,tileGridSize=(8,8))
-cl1=clahe.apply(dstg)
-cv2.imwrite('clahevein.png',dstg)
+cl1=clahe.apply(img2)
+cv2.imwrite('clahevein.png',cl1)
 bnw=cv2.imread('clahevein.png',cv2.IMREAD_GRAYSCALE)
-(thresh,imbw)=cv2.threshold(bnw,45,255,cv2.THRESH_BINARY_INV)
-cv2.imwrite('bwdeneme.png',imbw)
+thresh=cv2.adaptiveThreshold(bnw,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+cv2.imwrite('bwdeneme.png',thresh)
