@@ -5,7 +5,7 @@ import picamera
 import numpy as np
 from time import sleep
 camera=picamera.PiCamera()
-camera.resolution = (768,576)
+camera.resolution = (1920,1080)
 camera.contrast=100
 camera.sharpness=100
 camera.exposure_mode='auto'
