@@ -1,6 +1,4 @@
 import cv2
-from skimage import data,img_as_float
-from skimage import exposure
 import sys
 import os
 import picamera
@@ -15,16 +13,18 @@ camera.capture('denemedamar.png')
 sleep(0.042)
 src=cv2.imread('denemedamar.png')
 sleep(0.042)
-dstg=cv2.cvtColor(src,cv2.COLOR_BGR2GRAY)
+lab=cv2.cvtColor(src,cv2.COLOR_BGR2LAB)
+l,a,b=cv2.split(lab)
+clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+cl=clahe.apply(l)
+limg=cv2.merge((cl,a,b))
+retsrc=cv2.cvtColor(limg,cv2.COLOR_LAB2BGR)
 sleep(0.042)
-cv2.imwrite('test.png',dstg)
+cv2.imwrite('test.png',retsrc)
 sleep(0.042)
 img=cv2.imread('test.png',0)
-p2 = np.percentile(img, 2)
-p98 = np.percentile(img, 98)
-img_rescale = exposure.rescale_intensity(img, in_range=(p2, p98))
 sleep(0.042)
-equ=cv2.equalizeHist(img_rescale)
+equ=cv2.equalizeHist(img)
 sleep(0.042)
 cv2.imwrite('graywhist.png',equ)
 sleep(0.042)
