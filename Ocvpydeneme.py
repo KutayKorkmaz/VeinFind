@@ -1,4 +1,6 @@
 import cv2
+from skimage import data,img_as_float
+from skimage import exposure
 import sys
 import os
 import picamera
@@ -18,8 +20,11 @@ sleep(0.042)
 cv2.imwrite('test.png',dstg)
 sleep(0.042)
 img=cv2.imread('test.png',0)
+p2 = np.percentile(img, 2)
+p98 = np.percentile(img, 98)
+img_rescale = exposure.rescale_intensity(img, in_range=(p2, p98))
 sleep(0.042)
-equ=cv2.equalizeHist(img)
+equ=cv2.equalizeHist(img_rescale)
 sleep(0.042)
 cv2.imwrite('graywhist.png',equ)
 sleep(0.042)
