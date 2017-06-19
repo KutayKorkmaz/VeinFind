@@ -212,7 +212,10 @@ while 1:
 		matchlist.append(match2)
 		matchlist.append(match3)
 		matchlist.append(match4)
-	
+		match1 = sorted(match1, key = lambda x:x.distance)
+		match2 = sorted(match2, key = lambda x:x.distance)
+		match3 = sorted(match3, key = lambda x:x.distance)
+		match4 = sorted(match4, key = lambda x:x.distance)
 		matchknn1 = bf1.knnMatch(destrin,destr1,k=2)
 		matchknn2 = bf1.knnMatch(destrin,destr2,k=2)
 		matchknn3 = bf1.knnMatch(destrin,destr3,k=2)
@@ -232,7 +235,6 @@ while 1:
         	matchlistflnn.append(matchflnn2)
         	matchlistflnn.append(matchflnn3)
         	matchlistflnn.append(matchflnn4)
-	
 		goodinputm=[]
 		goodinputmknn=[]
 		goodinputmflnn=[]
@@ -260,10 +262,10 @@ while 1:
 	        print ("ratio of good bf matches to trained keypoints%",percentm ,"ratio of good knn matches to trained keypoints%" ,percentknn,"ratio of good flann matches to trained keypoints%" ,percentflnn)
 		if  (percentm >= 35 and percentknn >= 6 and percentflnn >= 6):
 			outimg=cv2.imread("matched.png",0)
-			printimg1=drawMatches(cl1,kpin,trainpic1,kptr1,match1)
-			printimg2=drawMatches(cl1,kpin,trainpic2,kptr2,match2)
-			printimg3=drawMatches(cl1,kpin,trainpic1,kptr3,match3)
-			printimg4=drawMatches(cl1,kpin,trainpic1,kptr4,match4)
+			printimg1=drawMatches(cl1,kpin,trainpic1,kptr1,match1[:10])
+			printimg2=drawMatches(cl1,kpin,trainpic2,kptr2,match2[:10])
+			printimg3=drawMatches(cl1,kpin,trainpic3,kptr3,match3[:10])
+			printimg4=drawMatches(cl1,kpin,trainpic4,kptr4,match4[:10])
 			cv2.imwrite("matched1.png",printimg1)
 			cv2.imwrite("matched2.png",printimg2)
 			cv2.imwrite("matched3.png",printimg3)

@@ -1,0 +1,117 @@
+from __future__ import print_function
+from imutils.video.pivideostream import PiVideoStream
+from imutils.video import FPS
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import imutils
+import argparse
+import time
+import cv2
+import numpy as np
+import RPi.GPIO as GPIO
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-n", "--num-frames", type=int, default=100,
+	help="no of frames to loop over for FPS test")
+ap.add_argument("-d", "--display", type=int, default=-1,
+	help="Whether or not frames should be displayed")
+args = vars(ap.parse_args())
+GPIO.setmode(GPIO.BCM)
+butPin=21
+GPIO.setup(butPin,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.add_event_detect(butPin, GPIO.RISING)
+# initialize the camera and stream
+# allow the camera to warmup
+vs = PiVideoStream().start()
+time.sleep(2.0)
+fps = FPS().start()
+train=0
+# capture frames from the camera
+#load train images and calculate biometrics
+trainpic1=cv2.imread("trainimg1.png",0)
+trainpic2=cv2.imread("trainimg2.png",0)
+trainpic3=cv2.imread("trainimg3.png",0)
+trainpic4=cv2.imread("trainimg4.png",0)
+sift=cv2.SIFT()
+kptr1, destr1 = sift.detectAndCompute(trainpic1,None)
+kptr2, destr2 = sift.detectAndCompute(trainpic2,None)
+kptr3, destr3 = sift.detectAndCompute(trainpic3,None)
+kptr4, destr4 = sift.detectAndCompute(trainpic4,None)
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck = True)
+matches12 = bf.knnMatch(destr1,destr2,k=2)
+matches13 = bf.knnMatch(destr1,destr3,k=2)
+matches14 = bf.knnMatch(destr1,destr4,k=2)
+matches23 = bf.knnMatch(destr2,destr3,k=2)
+matches24 = bf.knnMatch(destr2,destr4,k=2)
+matches34 = bf.knnMatch(destr3,destr4,k=2)
+good13=[]
+for m,n in matches,1
+while 1:
+    startt=time.time()
+    # grab the raw NumPy array representing the image, then initialize the timestamp
+    # and occupied/unoccupied text
+    frame = vs.read()
+    gray_image=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+    eqhi=cv2.equalizeHist(gray_image)
+    clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(5,5))
+    cl1 = clahe.apply(eqhi)
+    eqhia=cv2.equalizeHist(cl1)    
+    blur = cv2.GaussianBlur(eqhia,(5,5),sigmaX=5)
+    blur2 = cv2.GaussianBlur(eqhia,(15,15),sigmaX=25)
+    blurinv = cv2.bitwise_not(blur)
+    subtracted= cv2.add(blur2,blurinv)
+    #subtracted=cv2.absdiff(blur3,blur)
+    #subtracted2=cv2.absdiff(blur2,blur4)
+    eqhsub= cv2.equalizeHist(subtracted)
+    cl2=clahe.apply(eqhsub)
+    blur3=cv2.medianBlur(cl2,3)
+    eqhsub2=cv2.equalizeHist(blur3)
+    ret,th1 = cv2.threshold(eqhsub2,145,255,cv2.THRESH_BINARY_INV)
+    kernel = np.ones((3,3), np.uint8)
+    img_erosion = cv2.dilate(th1, kernel, iterations=1)
+    img_dilate = cv2.erode(img_erosion, kernel, iterations=1)
+
+    if GPIO.event_detected(butPin):
+	inimage=img_dilate
+	#if train==0:
+	#        cv2.imwrite("trainimg1.png",inimage)
+	#elif train==1:
+	#	cv2.imwrite("trainimg2.png",inimage)
+	#elif train==2:
+	#	cv2.imwrite("trainimg3.png",inimage)
+	#else :
+	#	cv2.imwrite("trainimg4.png",inimage)
+	kpin,destrin=orb.detectAndCompute(inimage,None)
+	match1=bf.match(destrin,destr1)
+	
+	match2=bf.match(destrin,destr2)
+
+  	match3=bf.match(destrin,destr3)
+
+	match4=bf.match(destrin,destr4)
+
+	print (len(match1),len(match2),len(match3),len(match4))
+	train+=1
+	del match1[:]
+        del match2[:]
+	del match3[:]
+    	del match4[:]
+       #img_erosion1 = cv2.erode(img_dilate, kernel, iterations=1)
+    #img_erosion = cv2.erode(th1, kernel, iterations=1)
+	
+    #eqhsub=cv2.equalizeHist(subtracted)
+    # ret2,th2 = cv2.threshold(eqhsub,126,255,cv2.THRESH_BINARY_INV)
+    # show the frame
+    cv2.imshow("Frame",img_dilate)
+    cv2.moveWindow("Frame",0,0)
+    cv2.setWindowProperty("Frame",cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
+    key = cv2.waitKey(1) & 0xFF
+    stopp=time.time()
+    secpframe=stopp-startt
+    framepsec=1/secpframe
+   # print (framepsec)
+   # print ( len(destr1),len(destr2),len(destr3),len(destr4))
+   # print (len(matches12),len(matches13),len(matches14),len(matches23),len(matches24),len(matches34))
+    # clear the stream in preparation for the next frame    
+    # if the `q` key was pressed, break from the loop
+    

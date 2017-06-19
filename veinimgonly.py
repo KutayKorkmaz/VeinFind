@@ -16,10 +16,10 @@ ap.add_argument("-n", "--num-frames", type=int, default=100,
 ap.add_argument("-d", "--display", type=int, default=-1,
 	help="Whether or not frames should be displayed")
 args = vars(ap.parse_args())
-GPIO.setmode(GPIO.BCM)
-butPin=21
-GPIO.setup(butPin,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(butPin, GPIO.RISING)
+#GPIO.setmode(GPIO.BCM)
+#butPin=21
+#GPIO.setup(butPin,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+#GPIO.add_event_detect(butPin, GPIO.RISING)
 # initialize the camera and stream
 # allow the camera to warmup
 vs = PiVideoStream().start()
@@ -33,7 +33,7 @@ train=0
 #trainpic2=cv2.imread("trainimg2.png",0)
 #trainpic3=cv2.imread("trainimg3.png",0)
 #trainpic4=cv2.imread("trainimg4.png",0)
-orb = cv2.ORB()
+#orb = cv2.ORB()
 #kptr1, destr1 = orb.detectAndCompute(trainpic1,None)
 #kptr2, destr2 = orb.detectAndCompute(trainpic2,None)
 #kptr3, destr3 = orb.detectAndCompute(trainpic3,None)
@@ -118,30 +118,29 @@ while 1:
     cl2=clahe.apply(eqhsub)
     blur3=cv2.medianBlur(cl2,3)
     eqhsub2=cv2.equalizeHist(blur3)
-    ret,th1 = cv2.threshold(eqhsub2,100,255,cv2.THRESH_BINARY_INV)  
+    ret,th1 = cv2.threshold(eqhsub2,145,255,cv2.THRESH_BINARY_INV)
     kernel = np.ones((3,3), np.uint8)
     img_erosion = cv2.dilate(th1, kernel, iterations=1)
     img_dilate = cv2.erode(img_erosion, kernel, iterations=1)
-    kpin,destrin = orb.detectAndCompute(cl1,None)
+    #kpin,destrin = orb.detectAndCompute(cl1,None)
 	
-    if GPIO.event_detected(butPin):
-	inimage=cl1
-	if fix==0:
-		print ("input taken")
-		if train==0:
-			cv2.imwrite("trainimg1.png",inimage)
-		elif train==1:
-			cv2.imwrite("trainimg2.png",inimage)
-		elif train==2:
-			cv2.imwrite("trainimg3.png",inimage)
-		elif train==3:
-			cv2.imwrite("trainimg4.png",inimage)
-		else:
-			train=2
-	else :
-		fix=-1
-		train+=1
-	fix+=1
+    #if GPIO.event_detected(butPin):
+	#inimage=cl1
+	#if fix==0:
+		#if train==0:
+		#	cv2.imwrite("trainimg1.png",inimage)
+		#elif train==1:
+		#	cv2.imwrite("trainimg2.png",inimage)
+		#elif train==2:
+		#	cv2.imwrite("trainimg3.png",inimage)
+		#elif train==3:
+		#	cv2.imwrite("trainimg4.png",inimage)
+		#else:
+		#	train=2
+	#else :
+	#	fix=-1
+	#	train+=1
+	#fix+=1
 		
 	#if train==0:
 	#        cv2.imwrite("trainimg1.png",inimage)
@@ -209,8 +208,8 @@ while 1:
     #eqhsub=cv2.equalizeHist(subtracted)
     # ret2,th2 = cv2.threshold(eqhsub,126,255,cv2.THRESH_BINARY_INV)
     # show the frame
-    outimg = cv2.drawKeypoints(cl1, kpin, None, color=(0,255,0), flags=0)
-    cv2.imshow("Frame",outimg)
+    #outimg = cv2.drawKeypoints(cl1, kpin, None, color=(0,255,0), flags=0)
+    cv2.imshow("Frame",img_dilate)
     cv2.moveWindow("Frame",0,0)
     cv2.setWindowProperty("Frame",cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
     key = cv2.waitKey(1) & 0xFF
